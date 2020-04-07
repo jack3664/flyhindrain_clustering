@@ -3,15 +3,28 @@ import matplotlib.pyplot as plot
 import numpy as np
 
 #Function used to the read the file containing the edges/nodes on the FlyHindrain network
-def readFile():
-    file = open("traced_total_connections.txt", "r")
-    graph = nx.read_weighted_edgelist(file, nodetype=int, create_using=nx.DiGraph())
-    file.close()
+def readFile(start_line_idx=0, read_n_lines=-1):
+    graph = nx.DiGraph()
+    weighted_edges = []
+
+    with open("traced_total_connections.txt", "r") as file:
+        count = 0
+        for line in file:
+            if read_n_lines > 0 and count > start_line_idx + read_n_lines:
+                break
+
+            if line[0] != '#' and count >= start_line_idx:
+                tokens = line.split()
+                weighted_edges.append((int(tokens[0]), int(tokens[1]), float(tokens[2])))
+
+            count += 1
+
+    graph.add_weighted_edges_from(weighted_edges)
+    
     return graph
 
 #Y-axis is the Fraction of Edges that has a certain weight. X-axis is are the weights: 1-10, 10-20, etc
-def fractionOfEdgesOverWeightGraph():
-    graph = readFile()
+def fractionOfEdgesOverWeightGraph(graph):
     edges_1 = [(u, v) for (u, v, d) in graph.edges(data=True) if (d['weight'] == 1)]
     edges_2_to_4 = [(u, v) for (u, v, d) in graph.edges(data=True) if (d['weight'] > 1 and d['weight'] <= 4)]
     edges_5_to_10 = [(u, v) for (u, v, d) in graph.edges(data=True) if (d['weight'] > 4 and d['weight'] <= 10)]
@@ -41,20 +54,27 @@ def fractionOfEdgesOverWeightGraph():
     
     plot.show()
     
-def nodesOverInDegrees():
-    graph = readFile()
+def nodesOverInDegrees(graph):
     print("Y-axis is the number of nodes. X-axis is the degree of In degrees")
     
-def nodesOverOutDegrees():
-    graph = readFile()
+def nodesOverOutDegrees(graph):
     print("Y-axis is the number of nodes. X-axis is the degree of Out degrees")
     
-def nodesOverWeightOfInDegrees():
-    graph = readFile()
+def nodesOverWeightOfInDegrees(graph):
+    # nodes_1_to_10 = []
     print("Y-axis is the number of nodes. X-axis is the weight of In degrees (can probably be 1-10, 10-20, etc. Experiment I guess")
     
-def nodesOverWeightOfOutDegrees():
-    graph= readFile()
+def nodesOverWeightOfOutDegrees(graph):
     print("Y-axis is the number of nodes. X-axis is the weight of Out degrees (can probably be 1-10, 10-20, etc. Experiment I guess")
+
+def main():
+    # Parse data file
+    # graph = readFile(1,100)
+    graph = readFile()
     
-fractionOfEdgesOverWeightGraph()
+    # Generate graphs
+    fractionOfEdgesOverWeightGraph(graph)
+    # nodesOverWeightOfInDegrees(graph)
+
+if __name__ == "__main__":
+    main()
