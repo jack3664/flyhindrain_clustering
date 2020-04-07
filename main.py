@@ -53,12 +53,36 @@ def fractionOfEdgesOverWeightGraph(graph):
         show.annotate(str(j), xy=(i-0.4, j+0.005))
     
     plot.show()
-    
-def nodesOverInDegrees(graph):
-    print("Y-axis is the number of nodes. X-axis is the degree of In degrees")
-    
-def nodesOverOutDegrees(graph):
-    print("Y-axis is the number of nodes. X-axis is the degree of Out degrees")
+
+# Y-axis is the number of nodes. X-axis is the degree of In degrees 
+def nodesOverInDegrees():
+    graph = readFile()
+    in_degrees = graph.in_degree()
+    in_degree_count = dict()
+
+    # out_degree is a tuple of (node, out_degree)
+    for in_degree in in_degrees:
+        in_degree_count[in_degree[1]] = in_degree_count.get(in_degree[1], 0) + 1
+
+    x_values, y_values = list(zip(*sorted(in_degree_count.items())))
+    number_of_bars = len(x_values)
+    plot.bar(range(number_of_bars), y_values)
+    plot.show()
+
+# Y-axis is the number of nodes. X-axis is the degree of Out degrees 
+def nodesOverOutDegrees():
+    graph = readFile()
+    out_degrees = graph.out_degree()
+    out_degree_count = dict()
+
+    # out_degree is a tuple of (node, out_degree)
+    for out_degree in out_degrees:
+        out_degree_count[out_degree[1]] = out_degree_count.get(out_degree[1], 0) + 1
+
+    x_values, y_values = list(zip(*sorted(out_degree_count.items())))
+    number_of_bars = len(x_values)
+    plot.bar(range(number_of_bars), y_values)
+    plot.show()
     
 def nodesOverWeightOfInDegrees(graph):
     bucket_ranges = [(1,100), (101,200), (201,300), (301,400), (401,500), (501,600), (601,700), (701,800), (801, 900)]
