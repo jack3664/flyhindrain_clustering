@@ -55,8 +55,7 @@ def fractionOfEdgesOverWeightGraph(graph):
     plot.show()
 
 # Y-axis is the number of nodes. X-axis is the degree of In degrees 
-def nodesOverInDegrees():
-    graph = readFile()
+def nodesOverInDegrees(graph):
     in_degrees = graph.in_degree()
     in_degree_count = dict()
 
@@ -70,8 +69,7 @@ def nodesOverInDegrees():
     plot.show()
 
 # Y-axis is the number of nodes. X-axis is the degree of Out degrees 
-def nodesOverOutDegrees():
-    graph = readFile()
+def nodesOverOutDegrees(graph):
     out_degrees = graph.out_degree()
     out_degree_count = dict()
 
@@ -85,36 +83,74 @@ def nodesOverOutDegrees():
     plot.show()
     
 def nodesOverWeightOfInDegrees(graph):
-    # nodes_1_to_10 = []
-    print("Y-axis is the number of nodes. X-axis is the weight of In degrees (can probably be 1-10, 10-20, etc. Experiment I guess")
-    
-# Y-axis is the number of nodes. X-axis is the weight of Out degrees.
-def nodesOverWeightOfOutDegrees():
-    graph = readFile()
-    n = nx.nodes(graph)
-    counters = {}
-    for i in n:
-        out = graph.out_degree(i)
-        if out in counters:
-            counters[out] += 1
-        counters.update({out: 1})
-        
-    # print(counters)
-    print(len(counters))
-    print(nx.number_of_nodes(graph))
+    bucket_ranges = [(1,100), (101,200), (201,300), (301,400), (401,500), (501,600), (601,700), (701,800), (801, 900)]
+    bucket_values = []
 
+    for bucket_range in bucket_ranges:
+        bucket_value = len([node for node in graph.nodes if graph.in_degree(node, weight='weight') >= bucket_range[0] and graph.out_degree(node, weight='weight') <= bucket_range[1]])
+        bucket_values.append(bucket_value)
+        # print("Nodes from {0} to {1}: {2}".format(bucket_range[0], bucket_range[1], bucket_value))
+    
+    leftover_bucket = len([node for node in graph.nodes if graph.in_degree(node, weight='weight') >= bucket_ranges[-1][1] + 1])
+    bucket_values.append(leftover_bucket)
+    # print("Nodes from {0} to n: {1}".format(bucket_ranges[-1][1] + 1, leftover_bucket))
+
+    bucket_labels = ["{0}-{1}".format(bucket_range[0], bucket_range[1]) for bucket_range in bucket_ranges]
+    bucket_labels.append("{0}+".format(bucket_ranges[-1][1] + 1))
+
+    # print(bucket_labels)
+    # print(bucket_values)
+
+    fig = plot.figure()
+    plot.xticks(range(len(bucket_labels)), bucket_labels)
+    
+    plot.xlabel("Weighted in-degree of nodes")
+    plot.ylabel("Number of nodes")
+    plot.title("Number of nodes with ranges of weighted in-degree")
+    
+    plot.bar(range(len(bucket_labels)), bucket_values)
+    
+    plot.show()
+
+    
+def nodesOverWeightOfOutDegrees(graph):
+    bucket_ranges = [(1,100), (101,200), (201,300), (301,400), (401,500), (501,600), (601,700), (701,800), (801, 900)]
+    bucket_values = []
+
+    for bucket_range in bucket_ranges:
+        bucket_value = len([node for node in graph.nodes if graph.out_degree(node, weight='weight') >= bucket_range[0] and graph.out_degree(node, weight='weight') <= bucket_range[1]])
+        bucket_values.append(bucket_value)
+        # print("Nodes from {0} to {1}: {2}".format(bucket_range[0], bucket_range[1], bucket_value))
+    
+    leftover_bucket = len([node for node in graph.nodes if graph.out_degree(node, weight='weight') >= bucket_ranges[-1][1] + 1])
+    bucket_values.append(leftover_bucket)
+    # print("Nodes from {0} to n: {1}".format(bucket_ranges[-1][1] + 1, leftover_bucket))
+
+    bucket_labels = ["{0}-{1}".format(bucket_range[0], bucket_range[1]) for bucket_range in bucket_ranges]
+    bucket_labels.append("{0}+".format(bucket_ranges[-1][1] + 1))
+
+    fig = plot.figure()
+    plot.xticks(range(len(bucket_labels)), bucket_labels)
+    
+    plot.xlabel("Weighted out-degree of nodes")
+    plot.ylabel("Number of nodes")
+    plot.title("Number of nodes with ranges of weighted out-degree")
+    
+    plot.bar(range(len(bucket_labels)), bucket_values)
+    
+    plot.show()
 
 def main():
     # Parse data file
-    # graph = readFile(1,100)
+    # graph = readFile(1,100000)
     graph = readFile()
     
     # Generate graphs
-    # fractionOfEdgesOverWeightGraph()
+    fractionOfEdgesOverWeightGraph(graph)
     nodesOverInDegrees()
     nodesOverOutDegrees()
-    # nodesOverWeightOfInDegrees()
-    # nodesOverWeightOfOutDegrees()
+    nodesOverWeightOfInDegrees(graph)
+    nodesOverWeightOfOutDegrees(graph)
 
 if __name__ == "__main__":
     main()
