@@ -104,20 +104,17 @@ def nodesOverWeightOfOutDegrees():
     print(nx.number_of_nodes(graph))
 
 
-# fractionOfEdgesOverWeightGraph()
-nodesOverInDegrees()
-nodesOverOutDegrees()
-# nodesOverWeightOfInDegrees()
-# nodesOverWeightOfOutDegrees()
-
 def main():
     # Parse data file
     # graph = readFile(1,100)
     graph = readFile()
     
     # Generate graphs
-    fractionOfEdgesOverWeightGraph(graph)
-    # nodesOverWeightOfInDegrees(graph)
+    # fractionOfEdgesOverWeightGraph()
+    nodesOverInDegrees()
+    nodesOverOutDegrees()
+    # nodesOverWeightOfInDegrees()
+    # nodesOverWeightOfOutDegrees()
 
 if __name__ == "__main__":
     main()
