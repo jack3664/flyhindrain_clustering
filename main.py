@@ -25,49 +25,16 @@ def readFile(start_line_idx=0, read_n_lines=-1):
     
     return graph
 
-#Function to read the file containing the edges excluding those with weights 1
-def readFileExcludingWeights1(start_line_idx=0, read_n_lines=-1):
-    graph = nx.DiGraph()
-    weighted_edges = []
-
-    with open("traced_total_connections.txt", "r") as file:
-        count = 0
-        for line in file:
-            if read_n_lines > 0 and count > start_line_idx + read_n_lines:
-                break
-
-            if line[0] != '#' and count >= start_line_idx:
-                tokens = line.split()
-                if (float(tokens[2]) != 1):
-                    weighted_edges.append((int(tokens[0]), int(tokens[1]), float(tokens[2])))
-
-            count += 1
-
-    graph.add_weighted_edges_from(weighted_edges)
-    
+#Function to remove all the edges with a specific weight or lower
+def removeEdgesWithSpecificWeight(graph, weight):
+    edges = graph.edges.data(data="weight", default=1)
+    edgesToRemove = []
+    for edge in edges:
+        if (edge[2] <= weight):
+            edgesToRemove.append(edge)
+    graph.remove_edges_from(edgesToRemove)
     return graph
 
-#Function to read the file containing the edges excluding those with weights 2
-def readFileExcludingWeights2(start_line_idx=0, read_n_lines=-1):
-    graph = nx.DiGraph()
-    weighted_edges = []
-
-    with open("traced_total_connections.txt", "r") as file:
-        count = 0
-        for line in file:
-            if read_n_lines > 0 and count > start_line_idx + read_n_lines:
-                break
-
-            if line[0] != '#' and count >= start_line_idx:
-                tokens = line.split()
-                if (float(tokens[2]) != 2):
-                    weighted_edges.append((int(tokens[0]), int(tokens[1]), float(tokens[2])))
-
-            count += 1
-
-    graph.add_weighted_edges_from(weighted_edges)
-    
-    return graph
 
 #Y-axis is the Fraction of Edges that has a certain weight. X-axis is are the weights: 1-10, 10-20, etc
 def fractionOfEdgesOverWeightGraph(graph):
@@ -211,6 +178,8 @@ def main():
     # Parse data file
     # graph = readFile(1,100000)
     graph = readFile()
+    
+    #print(str(nx.transitivity(graph)))
     
     # Generate graphs
 #     fractionOfEdgesOverWeightGraph(graph)
