@@ -1,6 +1,8 @@
 import networkx as nx
 import matplotlib.pyplot as plot
-import community as community_louvain
+import community as undirected_louvain
+import louvain as directed_louvain
+import igraph as ig
 
 #Function used to the read the file containing the edges/nodes on the FlyHindrain network
 def readFile(start_line_idx=0, read_n_lines=-1):
@@ -16,6 +18,50 @@ def readFile(start_line_idx=0, read_n_lines=-1):
             if line[0] != '#' and count >= start_line_idx:
                 tokens = line.split()
                 weighted_edges.append((int(tokens[0]), int(tokens[1]), float(tokens[2])))
+
+            count += 1
+
+    graph.add_weighted_edges_from(weighted_edges)
+    
+    return graph
+
+#Function to read the file containing the edges excluding those with weights 1
+def readFileExcludingWeights1(start_line_idx=0, read_n_lines=-1):
+    graph = nx.DiGraph()
+    weighted_edges = []
+
+    with open("traced_total_connections.txt", "r") as file:
+        count = 0
+        for line in file:
+            if read_n_lines > 0 and count > start_line_idx + read_n_lines:
+                break
+
+            if line[0] != '#' and count >= start_line_idx:
+                tokens = line.split()
+                if (float(tokens[2]) != 1):
+                    weighted_edges.append((int(tokens[0]), int(tokens[1]), float(tokens[2])))
+
+            count += 1
+
+    graph.add_weighted_edges_from(weighted_edges)
+    
+    return graph
+
+#Function to read the file containing the edges excluding those with weights 2
+def readFileExcludingWeights2(start_line_idx=0, read_n_lines=-1):
+    graph = nx.DiGraph()
+    weighted_edges = []
+
+    with open("traced_total_connections.txt", "r") as file:
+        count = 0
+        for line in file:
+            if read_n_lines > 0 and count > start_line_idx + read_n_lines:
+                break
+
+            if line[0] != '#' and count >= start_line_idx:
+                tokens = line.split()
+                if (float(tokens[2]) != 2):
+                    weighted_edges.append((int(tokens[0]), int(tokens[1]), float(tokens[2])))
 
             count += 1
 
@@ -140,18 +186,26 @@ def nodesOverWeightOfOutDegrees(graph):
     
     plot.show()
     
-def louvain_clustering(graph):
-    partition = community_louvain.best_partition(graph)
+#Running Louvain on undirected version of the graph
+def louvain_clustering_undirected(graph):
+    partition = undirected_louvain.best_partition(graph)
     
     #drawing
-    size = float(len(set(partition.values())))
     pos = nx.spring_layout(graph)
     count = 0.
-    for com in set(partition.values()) :
+    size_of_communities = []
+    for com in set(partition.values()):
         count = count + 1.
         list_nodes = [nodes for nodes in partition.keys() if partition[nodes] == com]
+        size_of_communities.append(len(list_nodes))
+    print(size_of_communities)
     nx.draw_networkx_nodes(graph, pos, alpha=0.5, node_size=5)
     plot.show()
+
+#Running Louvain on directed version of the graph
+def louvain_clustering_directed(graph):
+    #Need implementation, use the package for louvain directed
+    print("Directed louvain")
 
 def main():
     # Parse data file
@@ -168,9 +222,12 @@ def main():
     #This only removes like 50 nodes and there's only one strongly connected component, can't generate ten
     strongest_connected_graph = graph.subgraph(sorted(nx.strongly_connected_components(graph), key=len, reverse=True)[0])
     
-    #Test clustering algorithms on both the strongly connected graph, directed and undirected version
+    #Converting networkx to igraph to be used in directed louvain algorithm
+    igraph_directed = ig.Graph.Adjacency(nx.to_numpy_matrix(strongest_connected_graph) > 0).tolist()
+    
+    #Test clustering algorithms on the undirected strongly connected graphn
     undirected_version_graph = strongest_connected_graph.to_undirected()
-    louvain_clustering(undirected_version_graph)
+    louvain_clustering_undirected(undirected_version_graph)
 
 if __name__ == "__main__":
     main()
