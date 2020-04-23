@@ -1,6 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plot
-import numpy as np
+import community as community_louvain
 
 #Function used to the read the file containing the edges/nodes on the FlyHindrain network
 def readFile(start_line_idx=0, read_n_lines=-1):
@@ -139,6 +139,19 @@ def nodesOverWeightOfOutDegrees(graph):
     plot.bar(range(len(bucket_labels)), bucket_values)
     
     plot.show()
+    
+def louvain_clustering(graph):
+    partition = community_louvain.best_partition(graph)
+    
+    #drawing
+    size = float(len(set(partition.values())))
+    pos = nx.spring_layout(graph)
+    count = 0.
+    for com in set(partition.values()) :
+        count = count + 1.
+        list_nodes = [nodes for nodes in partition.keys() if partition[nodes] == com]
+    nx.draw_networkx_nodes(graph, pos, alpha=0.5, node_size=5)
+    plot.show()
 
 def main():
     # Parse data file
@@ -146,11 +159,18 @@ def main():
     graph = readFile()
     
     # Generate graphs
-    fractionOfEdgesOverWeightGraph(graph)
-    nodesOverInDegrees()
-    nodesOverOutDegrees()
-    nodesOverWeightOfInDegrees(graph)
-    nodesOverWeightOfOutDegrees(graph)
+#     fractionOfEdgesOverWeightGraph(graph)
+#     nodesOverInDegrees(graph)
+#     nodesOverOutDegrees(graph)
+#     nodesOverWeightOfInDegrees(graph)
+#     nodesOverWeightOfOutDegrees(graph)
+
+    #This only removes like 50 nodes and there's only one strongly connected component, can't generate ten
+    strongest_connected_graph = graph.subgraph(sorted(nx.strongly_connected_components(graph), key=len, reverse=True)[0])
+    
+    #Test clustering algorithms on both the strongly connected graph, directed and undirected version
+    undirected_version_graph = strongest_connected_graph.to_undirected()
+    louvain_clustering(undirected_version_graph)
 
 if __name__ == "__main__":
     main()
