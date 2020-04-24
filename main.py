@@ -158,7 +158,7 @@ def louvain_clustering_undirected(graph):
     partition = undirected_louvain.best_partition(graph)
     
     #drawing
-    pos = nx.spring_layout(graph)
+#     pos = nx.spring_layout(graph)
     count = 0.
     size_of_communities = []
     for com in set(partition.values()):
@@ -166,8 +166,27 @@ def louvain_clustering_undirected(graph):
         list_nodes = [nodes for nodes in partition.keys() if partition[nodes] == com]
         size_of_communities.append(len(list_nodes))
     print(size_of_communities)
-    nx.draw_networkx_nodes(graph, pos, alpha=0.5, node_size=5)
-    plot.show()
+#     nx.draw_networkx_nodes(graph, pos, alpha=0.5, node_size=5)
+#     plot.show()
+
+# Will run louvain on every variation of our undirected graphs
+def louvain_all_undirected(graph):
+    #Not removing any edges and running louvain on the strongest connected component of original graph since we know there's only one with many nodes
+    original_graph = graph.subgraph(sorted(nx.strongly_connected_components(graph), key=len, reverse=True)[0]).to_undirected()
+    louvain_clustering_undirected(original_graph)
+    
+    #Remove the edge weight of 1 and obtaining the strongest connected, undirected component since we know there's only one with many nodes
+    remove_1_graph = graph.subgraph(sorted(nx.strongly_connected_components(removeEdgesWithSpecificWeight(graph, 1)), key=len, reverse=True)[0]).to_undirected()
+    louvain_clustering_undirected(remove_1_graph)
+    
+    #Remove the edge weights of 1 and 2 and obtaining the strongest connected, undirected component since we know there's only one with many nodes
+    remove_1_2_graph = graph.subgraph(sorted(nx.strongly_connected_components(removeEdgesWithSpecificWeight(graph, 2)), key=len, reverse=True)[0]).to_undirected()
+    louvain_clustering_undirected(remove_1_2_graph)
+    
+    #Remove the edge weights of 1, 2, and 3 and obtaining the strongest connected, undirected component since we know there's only one with many nodes
+    remove_1_2_3_graph = graph.subgraph(sorted(nx.strongly_connected_components(removeEdgesWithSpecificWeight(graph, 3)), key=len, reverse=True)[0]).to_undirected()
+    louvain_clustering_undirected(remove_1_2_3_graph)
+    
 
 #Running Louvain on directed version of the graph
 def louvain_clustering_directed(graph):
@@ -188,15 +207,14 @@ def main():
 #     nodesOverWeightOfInDegrees(graph)
 #     nodesOverWeightOfOutDegrees(graph)
 
+    louvain_all_undirected(graph)
+
     #This only removes like 50 nodes and there's only one strongly connected component, can't generate ten
     strongest_connected_graph = graph.subgraph(sorted(nx.strongly_connected_components(graph), key=len, reverse=True)[0])
-    
+
     #Converting networkx to igraph to be used in directed louvain algorithm
-    igraph_directed = ig.Graph.Adjacency(nx.to_numpy_matrix(strongest_connected_graph) > 0).tolist()
+    igraph_directed = ig.Graph.Adjacency((nx.to_numpy_matrix(strongest_connected_graph) > 0).tolist())
     
-    #Test clustering algorithms on the undirected strongly connected graphn
-    undirected_version_graph = strongest_connected_graph.to_undirected()
-    louvain_clustering_undirected(undirected_version_graph)
 
 if __name__ == "__main__":
     main()
