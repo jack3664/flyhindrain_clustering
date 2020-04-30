@@ -3,6 +3,7 @@ import matplotlib.pyplot as plot
 import community as undirected_louvain
 import louvain as directed_louvain
 import igraph as ig
+from networkx.algorithms.community.centrality import girvan_newman
 
 #Function used to the read the file containing the edges/nodes on the FlyHindrain network
 def readFile(start_line_idx=0, read_n_lines=-1):
@@ -193,6 +194,22 @@ def louvain_clustering_directed(graph):
     #Need implementation, use the package for louvain directed
     print("Directed louvain")
 
+def girvan_newman_clustering(graph):
+    original_graph = graph.subgraph(sorted(nx.strongly_connected_components(graph), key=len, reverse=True)[0]).to_undirected()
+    girvan_newman(original_graph)
+    
+    #Remove the edge weight of 1 and obtaining the strongest connected, undirected component since we know there's only one with many nodes
+    remove_1_graph = graph.subgraph(sorted(nx.strongly_connected_components(removeEdgesWithSpecificWeight(graph, 1)), key=len, reverse=True)[0]).to_undirected()
+    girvan_newman(remove_1_graph)
+    
+    #Remove the edge weights of 1 and 2 and obtaining the strongest connected, undirected component since we know there's only one with many nodes
+    remove_1_2_graph = graph.subgraph(sorted(nx.strongly_connected_components(removeEdgesWithSpecificWeight(graph, 2)), key=len, reverse=True)[0]).to_undirected()
+    girvan_newman(remove_1_2_graph)
+    
+    #Remove the edge weights of 1, 2, and 3 and obtaining the strongest connected, undirected component since we know there's only one with many nodes
+    remove_1_2_3_graph = graph.subgraph(sorted(nx.strongly_connected_components(removeEdgesWithSpecificWeight(graph, 3)), key=len, reverse=True)[0]).to_undirected()
+    girvan_newman(remove_1_2_3_graph)
+
 def main():
     # Parse data file
     # graph = readFile(1,100000)
@@ -215,6 +232,7 @@ def main():
     #Converting networkx to igraph to be used in directed louvain algorithm
     igraph_directed = ig.Graph.Adjacency((nx.to_numpy_matrix(strongest_connected_graph) > 0).tolist())
     
+    # girvan_newman_clustering(graph)
 
 if __name__ == "__main__":
     main()
