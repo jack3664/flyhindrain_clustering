@@ -72,13 +72,15 @@ def nodesOverInDegrees(graph):
     in_degrees = graph.in_degree()
     in_degree_count = dict()
 
-    # out_degree is a tuple of (node, out_degree)
+    # in_degree is a tuple of (node, in_degree)
     for in_degree in in_degrees:
         in_degree_count[in_degree[1]] = in_degree_count.get(in_degree[1], 0) + 1
 
     x_values, y_values = list(zip(*sorted(in_degree_count.items())))
-    number_of_bars = len(x_values)
-    plot.bar(range(number_of_bars), y_values)
+    plot.xlabel('In Degree of Node')
+    plot.ylabel('Number of Nodes')
+    plot.title('Number of Nodes for Degree Node')
+    plot.bar(x_values, y_values)
     plot.show()
 
 # Y-axis is the number of nodes. X-axis is the degree of Out degrees 
