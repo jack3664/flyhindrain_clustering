@@ -1,4 +1,5 @@
 import networkx as nx
+import itertools
 # import matplotlib.pyplot as plot
 # import community as undirected_louvain
 # import louvain as directed_louvain
@@ -39,41 +40,44 @@ def girvan_newman_clustering(graph):
     original_graph = graph.subgraph(sorted(nx.strongly_connected_components(graph), key=len, reverse=True)[0])
     comp = girvan_newman(original_graph)
     count = 0
-    print(tuple(sorted(c) for c in next(comp)))
-    for c in next(comp):
+#     print(tuple(sorted(c) for c in next(comp)))
+    for communities in comp:
+        print("1")
+        print(type(communities))
         count = count + 1
+        break
+    
     print("Number of Communities:" + count)
-    print("")
-    
-    #Remove the edge weight of 1 and obtaining the strongest connected, undirected component since we know there's only one with many nodes
-    remove_1_graph = graph.subgraph(sorted(nx.strongly_connected_components(removeEdgesWithSpecificWeight(graph, 1)), key=len, reverse=True)[0])
-    comp1 = girvan_newman(remove_1_graph)
-    count1 = 0
-    print(tuple(sorted(c) for c in next(comp1)))
-    for c in next(comp1):
-        count1 = count1 + 1
-    print("Number of Communities:" + count1)
-    print("")
-    
-    #Remove the edge weights of 1 and 2 and obtaining the strongest connected, undirected component since we know there's only one with many nodes
-    remove_1_2_graph = graph.subgraph(sorted(nx.strongly_connected_components(removeEdgesWithSpecificWeight(graph, 2)), key=len, reverse=True)[0])
-    comp12 = girvan_newman(remove_1_2_graph)
-    count12 = 0
-    print(tuple(sorted(c) for c in next(comp12)))
-    for c in next(comp12):
-        count12 = count12 + 1
-    print("Number of Communities:" + count12)
-    print("")
-    
-    #Remove the edge weights of 1, 2, and 3 and obtaining the strongest connected, undirected component since we know there's only one with many nodes
-    remove_1_2_3_graph = graph.subgraph(sorted(nx.strongly_connected_components(removeEdgesWithSpecificWeight(graph, 3)), key=len, reverse=True)[0])
-    comp123 = girvan_newman(remove_1_2_3_graph)
-    count123 = 0
-    print(tuple(sorted(c) for c in next(comp123)))
-    for c in next(comp123):
-        count123 = count123 + 1
-    print("Number of Communities:" + count123)
-    print("")
+#     
+#     #Remove the edge weight of 1 and obtaining the strongest connected, undirected component since we know there's only one with many nodes
+#     remove_1_graph = graph.subgraph(sorted(nx.strongly_connected_components(removeEdgesWithSpecificWeight(graph, 1)), key=len, reverse=True)[0])
+#     comp1 = girvan_newman(remove_1_graph)
+#     count1 = 0
+#     print(tuple(sorted(c) for c in next(comp1)))
+#     for c in next(comp1):
+#         count1 = count1 + 1
+#     print("Number of Communities:" + count1)
+#     print("")
+#     
+#     #Remove the edge weights of 1 and 2 and obtaining the strongest connected, undirected component since we know there's only one with many nodes
+#     remove_1_2_graph = graph.subgraph(sorted(nx.strongly_connected_components(removeEdgesWithSpecificWeight(graph, 2)), key=len, reverse=True)[0])
+#     comp12 = girvan_newman(remove_1_2_graph)
+#     count12 = 0
+#     print(tuple(sorted(c) for c in next(comp12)))
+#     for c in next(comp12):
+#         count12 = count12 + 1
+#     print("Number of Communities:" + count12)
+#     print("")
+#     
+#     #Remove the edge weights of 1, 2, and 3 and obtaining the strongest connected, undirected component since we know there's only one with many nodes
+#     remove_1_2_3_graph = graph.subgraph(sorted(nx.strongly_connected_components(removeEdgesWithSpecificWeight(graph, 3)), key=len, reverse=True)[0])
+#     comp123 = girvan_newman(remove_1_2_3_graph)
+#     count123 = 0
+#     print(tuple(sorted(c) for c in next(comp123)))
+#     for c in next(comp123):
+#         count123 = count123 + 1
+#     print("Number of Communities:" + count123)
+#     print("")
 
 def main():
     # Parse data file
