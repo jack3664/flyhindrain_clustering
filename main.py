@@ -215,6 +215,10 @@ def main():
     # graph = readFile(1,100000)
     graph = readFile()
     
+    comp = girvan_newman(graph)
+    
+    print(comp)
+    
     #print(str(nx.transitivity(graph)))
     
     # Generate graphs
